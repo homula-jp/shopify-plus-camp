@@ -1,0 +1,23 @@
+.alert .alert-inner {
+  padding: 2rem;
+}
+
+.alert .alert-heading {
+  margin: 0;
+}
+
+.alert .alert-content {
+  margin: 1.5rem 0 0 0;
+}
+
+.alert .alert-content *:last-child {
+  margin-bottom: 0;
+}
+
+.alert .alert-inner.color-info {
+  background-color: rgb(229, 246, 253);
+}
+
+.alert .alert-inner.color-warning {
+  background-color: rgb(251, 248, 246);
+}

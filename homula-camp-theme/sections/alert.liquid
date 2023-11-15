@@ -1,0 +1,51 @@
+{{ 'section-alert.css' | asset_url | stylesheet_tag }}
+
+<div class="alert page-width content-container">
+    <div class="alert-inner color-{{ section.settings.color }}">
+        <h2 class="alert-heading">{{ section.settings.heading }}</h2>
+        {% if section.settings.content %}
+            <div class="alert-content">{{ section.settings.content }}</div>
+        {% endif %}
+    </div>
+</div>
+
+{% schema %}
+  {
+    "name": "Alert",
+    "settings": [
+        {
+            "type": "select",
+            "id": "color",
+            "label": "color",
+            "options": [
+                {
+                    "value": "info",
+                    "label": "Info"
+                },
+                {
+                    "value": "warning",
+                    "label": "Warning"
+                }
+            ],
+            "default": "info"
+        },
+        {
+            "type": "text",
+            "id": "heading",
+            "label": "Heading",
+            "default": "Alert heading!"
+        },
+        {
+            "type": "richtext",
+            "id": "content",
+            "label": "Content",
+            "default": "<p>Alert content!</p>"
+        }
+    ],
+    "presets": [
+        {
+            "name": "Alert"
+        }
+    ]
+  }
+{% endschema %}

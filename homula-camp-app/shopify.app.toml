@@ -2,19 +2,19 @@
 
 name = "homula-camp-app"
 client_id = "a8afb1ab2ec6bc948536795b73e19062"
-application_url = "https://investors-accessing-role-gale.trycloudflare.com"
+application_url = "https://effect-processing-worn-date.trycloudflare.com"
 embedded = true
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "write_products,read_orders,read_customers"
+scopes = "write_products,read_orders,write_order_edits,write_marketplace_orders,read_customers"
 
 [auth]
 redirect_urls = [
-  "https://investors-accessing-role-gale.trycloudflare.com/auth/callback",
-  "https://investors-accessing-role-gale.trycloudflare.com/auth/shopify/callback",
-  "https://investors-accessing-role-gale.trycloudflare.com/api/auth/callback",
-  "https://investors-accessing-role-gale.trycloudflare.com/.shopify/graphiql/auth/callback"
+  "https://effect-processing-worn-date.trycloudflare.com/auth/callback",
+  "https://effect-processing-worn-date.trycloudflare.com/auth/shopify/callback",
+  "https://effect-processing-worn-date.trycloudflare.com/api/auth/callback",
+  "https://effect-processing-worn-date.trycloudflare.com/.shopify/graphiql/auth/callback"
 ]
 
 [webhooks]

@@ -61,8 +61,67 @@ export const getOrderList = async ({ request }: ActionFunctionArgs) => {
   };
 };
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const updateOrder = async ({ request, params }: ActionFunctionArgs) => {
   const { admin } = await authenticate.admin(request);
+  const response = await admin.graphql(
+    `#graphql
+      mutation orderUpdate($input: OrderInput!) {
+        orderUpdate(input: $input) {
+          order {
+            id
+            createdAt
+            customAttributes {
+              key
+              value
+            }
+            displayFulfillmentStatus
+            name
+            note
+            customer {
+              displayName
+            }
+            updatedAt
+          }
+          userErrors {
+            field
+            message
+          }
+        }
+      }
+    `,
+    {
+      variables: {
+        input: {
+          id: params.id,
+          customAttributes: {
+            key: "CompleteEngraving",
+            value: true,
+          },
+        },
+      },
+    }
+  );
+
+  const responseJson = await response.json();
+
+  return json({
+    order: responseJson.data.orderUpdate.order,
+  });
+};
+
+export const action = async ({ request, context }: ActionFunctionArgs) => {
+  const { admin } = await authenticate.admin(request);
+  const formData = await request.clone().formData();
+  const _action = formData.get("_action");
+
+  if (_action === "UPDATE") {
+    return await updateOrder({
+      request,
+      params: { id: formData.get("id") as string },
+      context,
+    });
+  }
+
   const color = ["Red", "Orange", "Yellow", "Green"][
     Math.floor(Math.random() * 4)
   ];
@@ -121,12 +180,12 @@ export default function Index() {
       shopify.toast.show("Product created");
     }
   }, [productId]);
-  const generateProduct = () => submit({}, { replace: true, method: "POST" });
+  const submitAction = () => submit({}, { replace: true, method: "POST" });
 
   return (
     <Page>
       <ui-title-bar title="Homula Camp App">
-        <button variant="primary" onClick={generateProduct}>
+        <button variant="primary" onClick={submitAction}>
           Generate a product
         </button>
       </ui-title-bar>
@@ -149,8 +208,13 @@ export default function Index() {
                   <OrderList orders={data.orders} />
                 </BlockStack>
                 <InlineStack gap="300">
-                  <Button loading={isLoading} onClick={generateProduct}>
-                    Generate a product
+                  <Button
+                    loading={isLoading}
+                    onClick={submitAction}
+                    name="_action"
+                    value="UPDATE"
+                  >
+                    刻印完了
                   </Button>
                   {actionData?.product && (
                     <Button

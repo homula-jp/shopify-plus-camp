@@ -164,9 +164,6 @@ export default function Index() {
 
   return (
     <Page>
-      <ui-title-bar title="Homula Camp App">
-        <button variant="primary">Generate a product</button>
-      </ui-title-bar>
       <BlockStack gap="500">
         <Layout>
           <Layout.Section>

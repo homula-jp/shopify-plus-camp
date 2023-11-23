@@ -32,13 +32,24 @@ export const OrderList: React.FC<OrderListProps> = ({
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       const formData = new FormData(e.currentTarget);
-      selectedResources.forEach((id) => {
-        const order = orders.find((order) => order.id === id);
-        formData.append(
-          "orders[]",
-          JSON.stringify({ id, customAttributes: order?.customAttributes })
-        );
-      });
+      selectedResources
+        .map((id) => orders.find((order) => order.id === id)!)
+        .filter((order) => {
+          const completed =
+            order.customAttributes.find(
+              ({ key }) => key === "EngravingCompleted"
+            )?.value === "true";
+          return !completed;
+        })
+        .forEach((order) => {
+          formData.append(
+            "orders[]",
+            JSON.stringify({
+              id: order.id,
+              customAttributes: order?.customAttributes,
+            })
+          );
+        });
       submitAction(formData);
     },
     [selectedResources]

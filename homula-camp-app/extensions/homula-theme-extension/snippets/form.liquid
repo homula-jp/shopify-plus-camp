@@ -1,8 +1,12 @@
-<script>
-  alert(0);
+<script async>
+  function onSubmit(event) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    console.log(formData.values());
+  }
 </script>
 
-<form>
-  {{ 'product.product_id' | t }}: <input type="text" name="productId" />
+<form onsubmit="onSubmit(event)">
+  {{ 'product.product_id' | t }}: <input type="text" name="product_id" />
   <button type="submit">送信</button>
 </form>

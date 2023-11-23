@@ -1,24 +1,17 @@
-import { useEffect } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
+import type { SubmitFunction } from "@remix-run/react";
 import {
   useActionData,
   useLoaderData,
   useNavigation,
   useSubmit,
 } from "@remix-run/react";
-import {
-  Page,
-  Layout,
-  Text,
-  Card,
-  Button,
-  BlockStack,
-  Box,
-  InlineStack,
-} from "@shopify/polaris";
+import { Page, Layout, Text, Card, BlockStack, Box } from "@shopify/polaris";
 import { authenticate } from "../shopify.server";
 import { OrderList } from "~/components/OrderList";
+import type { Order } from "~/types/order";
+import type { Data } from "~/types/remix";
 
 export const loader = async (loaderArgs: LoaderFunctionArgs) => {
   await authenticate.admin(loaderArgs.request);
@@ -31,21 +24,29 @@ export const getOrderList = async ({ request }: ActionFunctionArgs) => {
   const response = await admin.graphql(
     `#graphql
       query getOrders {
-        orders(first: 100, query: "fulfillment_status:unshipped") {
+        orders(first: 20, query: "fulfillment_status:unshipped") {
           nodes {
             id
             createdAt
+            displayFulfillmentStatus
+            name
+            note
+            updatedAt
             customAttributes {
               key
               value
             }
-            displayFulfillmentStatus
-            name
-            note
             customer {
               displayName
             }
-            updatedAt
+            lineItems(first: 20) {
+              nodes {
+                customAttributes {
+                  key
+                  value
+                }
+              }
+            }
           }
         }
       }
@@ -55,13 +56,24 @@ export const getOrderList = async ({ request }: ActionFunctionArgs) => {
   const responseJson = await response.json();
 
   return {
-    orders: responseJson.data.orders.nodes.filter(({ customAttributes }: any) =>
-      customAttributes.find(({ key }: any) => key === "Engraving")
+    orders: (responseJson.data.orders.nodes as Order[]).filter(
+      ({ customAttributes }) =>
+        customAttributes.find(({ key }) => key === "Engraving")
     ),
   };
 };
 
-export const updateOrder = async ({ request, params }: ActionFunctionArgs) => {
+export const updateOrder = async ({
+  request,
+  params,
+}: {
+  request: ActionFunctionArgs["request"];
+  context: ActionFunctionArgs["context"];
+  params: {
+    id: Order["id"];
+    customAttributes: Order["customAttributes"];
+  };
+}) => {
   const { admin } = await authenticate.admin(request);
   const response = await admin.graphql(
     `#graphql
@@ -93,10 +105,13 @@ export const updateOrder = async ({ request, params }: ActionFunctionArgs) => {
       variables: {
         input: {
           id: params.id,
-          customAttributes: {
-            key: "CompleteEngraving",
-            value: true,
-          },
+          customAttributes: [
+            ...params.customAttributes,
+            {
+              key: "EngravingCompleted",
+              value: "true",
+            },
+          ],
         },
       },
     }
@@ -104,90 +119,53 @@ export const updateOrder = async ({ request, params }: ActionFunctionArgs) => {
 
   const responseJson = await response.json();
 
-  return json({
-    order: responseJson.data.orderUpdate.order,
-  });
+  return json(responseJson.data.orderUpdate.order as Order);
 };
 
 export const action = async ({ request, context }: ActionFunctionArgs) => {
-  const { admin } = await authenticate.admin(request);
   const formData = await request.clone().formData();
   const _action = formData.get("_action");
 
   if (_action === "UPDATE") {
-    return await updateOrder({
-      request,
-      params: { id: formData.get("id") as string },
-      context,
+    const newOrders = (formData.getAll("orders[]") as string[]).map((data) =>
+      JSON.parse(data)
+    ) as {
+      id: Order["id"];
+      customAttributes: Order["customAttributes"];
+    }[];
+    const result = await Promise.all(
+      newOrders.map(async ({ id, customAttributes }) => {
+        const response = await updateOrder({
+          request,
+          params: { id, customAttributes },
+          context,
+        });
+
+        return response.json();
+      })
+    );
+
+    return json({
+      orders: result,
     });
   }
-
-  const color = ["Red", "Orange", "Yellow", "Green"][
-    Math.floor(Math.random() * 4)
-  ];
-  const response = await admin.graphql(
-    `#graphql
-      mutation populateProduct($input: ProductInput!) {
-        productCreate(input: $input) {
-          product {
-            id
-            title
-            handle
-            status
-            variants(first: 10) {
-              edges {
-                node {
-                  id
-                  price
-                  barcode
-                  createdAt
-                }
-              }
-            }
-          }
-        }
-      }`,
-    {
-      variables: {
-        input: {
-          title: `${color} Snowboard`,
-          variants: [{ price: Math.random() * 100 }],
-        },
-      },
-    }
-  );
-  const responseJson = await response.json();
-
-  return await json({
-    product: responseJson.data.productCreate.product,
-  });
 };
 
 export default function Index() {
   const nav = useNavigation();
-  const data = useLoaderData<typeof loader>();
-  const actionData = useActionData<typeof action>();
+  const data = useLoaderData<typeof loader>() as Data<typeof loader>;
+  const actionData = useActionData<typeof action>() as Data<typeof action>;
   const submit = useSubmit();
   const isLoading =
     ["loading", "submitting"].includes(nav.state) && nav.formMethod === "POST";
-  const productId = actionData?.product?.id.replace(
-    "gid://shopify/Product/",
-    ""
-  );
 
-  useEffect(() => {
-    if (productId) {
-      shopify.toast.show("Product created");
-    }
-  }, [productId]);
-  const submitAction = () => submit({}, { replace: true, method: "POST" });
+  const submitAction = (target: Parameters<SubmitFunction>[0]) =>
+    submit(target, { replace: true, method: "POST" });
 
   return (
     <Page>
       <ui-title-bar title="Homula Camp App">
-        <button variant="primary" onClick={submitAction}>
-          Generate a product
-        </button>
+        <button variant="primary">Generate a product</button>
       </ui-title-bar>
       <BlockStack gap="500">
         <Layout>
@@ -205,28 +183,13 @@ export default function Index() {
                   </Text>
                 </BlockStack>
                 <BlockStack gap="200">
-                  <OrderList orders={data.orders} />
+                  <OrderList
+                    isLoading={isLoading}
+                    submitAction={submitAction}
+                    orders={data.orders}
+                  />
                 </BlockStack>
-                <InlineStack gap="300">
-                  <Button
-                    loading={isLoading}
-                    onClick={submitAction}
-                    name="_action"
-                    value="UPDATE"
-                  >
-                    刻印完了
-                  </Button>
-                  {actionData?.product && (
-                    <Button
-                      url={`shopify:admin/products/${productId}`}
-                      target="_blank"
-                      variant="plain"
-                    >
-                      View product
-                    </Button>
-                  )}
-                </InlineStack>
-                {actionData?.product && (
+                {actionData && actionData?.orders.length > 0 && (
                   <Box
                     padding="400"
                     background="bg-surface-active"
@@ -235,9 +198,16 @@ export default function Index() {
                     borderColor="border"
                     overflowX="scroll"
                   >
-                    <pre style={{ margin: 0 }}>
-                      <code>{JSON.stringify(actionData.product, null, 2)}</code>
-                    </pre>
+                    <ul>
+                      {actionData.orders.map((order) => (
+                        <li key={order.id}>
+                          <Text fontWeight="bold" as="span">
+                            {order.name}
+                          </Text>
+                          を刻印済みにしました。
+                        </li>
+                      ))}
+                    </ul>
                   </Box>
                 )}
               </BlockStack>

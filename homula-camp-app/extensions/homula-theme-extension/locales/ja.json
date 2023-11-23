@@ -1,0 +1,8 @@
+{
+  "product": {
+    "product_id": "商品ID",
+    "home": {
+      "recommendationText": "Recommended Product!"
+    }
+  }
+}

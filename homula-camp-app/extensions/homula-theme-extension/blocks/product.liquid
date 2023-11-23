@@ -1,0 +1,15 @@
+
+<div style="color:{{ block.settings.colour }}">
+  {% render 'form' %}
+</div>
+
+{% schema %}
+{
+  "name": "Product",
+  "target": "section",
+  "settings": [
+    { "type": "color", "id": "colour", "label": "Star Colour", "default": "#ff0000" }
+  ]
+}
+{% endschema %}
+

@@ -1,10 +1,4 @@
-<script async>
-  function onSubmit(event) {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    console.log(formData.values());
-  }
-</script>
+<script src="{{ 'form.js' | asset_url }}" defer></script>
 
 <form onsubmit="onSubmit(event)">
   {{ 'product.product_id' | t }}: <input type="text" name="product_id" />

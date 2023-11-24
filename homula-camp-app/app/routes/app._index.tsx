@@ -56,10 +56,11 @@ export const getOrderList = async ({ request }: ActionFunctionArgs) => {
   const responseJson = await response.json();
 
   return {
-    orders: (responseJson.data.orders.nodes as Order[]).filter(
-      ({ customAttributes }) =>
-        customAttributes.find(({ key }) => key === "Engraving")
-    ),
+    // orders: (responseJson.data.orders.nodes as Order[]).filter(
+    //   ({ customAttributes }) =>
+    //     customAttributes.find(({ key }) => key === "Engraving")
+    // ),
+    orders: responseJson.data.orders.nodes as Order[],
   };
 };
 

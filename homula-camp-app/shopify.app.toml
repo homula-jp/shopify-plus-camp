@@ -2,7 +2,7 @@
 
 name = "homula-camp-app"
 client_id = "a8afb1ab2ec6bc948536795b73e19062"
-application_url = "https://much-cope-lyrics-graduate.trycloudflare.com"
+application_url = "https://homula-camp-app.fly.dev"
 embedded = true
 
 [access_scopes]
@@ -11,10 +11,10 @@ scopes = "write_products,read_orders,write_orders,write_order_edits,read_custome
 
 [auth]
 redirect_urls = [
-  "https://much-cope-lyrics-graduate.trycloudflare.com/auth/callback",
-  "https://much-cope-lyrics-graduate.trycloudflare.com/auth/shopify/callback",
-  "https://much-cope-lyrics-graduate.trycloudflare.com/api/auth/callback",
-  "https://much-cope-lyrics-graduate.trycloudflare.com/.shopify/graphiql/auth/callback"
+  "https://homula-camp-app.fly.dev/auth/callback",
+  "https://homula-camp-app.fly.dev/auth/shopify/callback",
+  "https://homula-camp-app.fly.dev/api/auth/callback",
+  "https://homula-camp-app.fly.dev/.shopify/graphiql/auth/callback"
 ]
 
 [webhooks]

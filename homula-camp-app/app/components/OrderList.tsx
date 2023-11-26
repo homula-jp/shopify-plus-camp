@@ -61,7 +61,7 @@ export const OrderList: React.FC<OrderListProps> = ({
         <IndexTable
           itemCount={orders.length}
           headings={[
-            { title: "注文" },
+            { title: "注文", alignment: "start" },
             { title: "注文作成日時" },
             { title: "顧客" },
             { title: "刻印" },

@@ -2,7 +2,7 @@
 
 name = "homula-camp-app"
 client_id = "a8afb1ab2ec6bc948536795b73e19062"
-application_url = "https://worried-plymouth-outdoor-kept.trycloudflare.com"
+application_url = "https://environmental-ala-toll-term.trycloudflare.com"
 embedded = true
 
 [access_scopes]
@@ -11,10 +11,10 @@ scopes = "write_products,read_orders,write_orders,write_order_edits,read_custome
 
 [auth]
 redirect_urls = [
-  "https://worried-plymouth-outdoor-kept.trycloudflare.com/auth/callback",
-  "https://worried-plymouth-outdoor-kept.trycloudflare.com/auth/shopify/callback",
-  "https://worried-plymouth-outdoor-kept.trycloudflare.com/api/auth/callback",
-  "https://worried-plymouth-outdoor-kept.trycloudflare.com/.shopify/graphiql/auth/callback"
+  "https://environmental-ala-toll-term.trycloudflare.com/auth/callback",
+  "https://environmental-ala-toll-term.trycloudflare.com/auth/shopify/callback",
+  "https://environmental-ala-toll-term.trycloudflare.com/api/auth/callback",
+  "https://environmental-ala-toll-term.trycloudflare.com/.shopify/graphiql/auth/callback"
 ]
 
 [webhooks]

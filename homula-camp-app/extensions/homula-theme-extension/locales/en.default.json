@@ -1,8 +1,6 @@
 {
   "product": {
     "product_id": "Product ID",
-    "home": {
-      "recommendationText": "Recommended Product!"
-    }
+    "submit": "Get Product Name"
   }
 }

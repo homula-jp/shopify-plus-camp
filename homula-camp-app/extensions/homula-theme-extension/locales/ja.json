@@ -1,8 +1,6 @@
 {
   "product": {
     "product_id": "商品ID",
-    "home": {
-      "recommendationText": "Recommended Product!"
-    }
+    "submit": "商品名を取得"
   }
 }

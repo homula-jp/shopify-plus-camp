@@ -1,6 +1,45 @@
 <script src="{{ 'form.js' | asset_url }}" defer></script>
+<style>
+  .product-id-input {
+    border: 0;
+    border-radius: 4px;
+    padding: 8px;
+    background-color: #fafafa;
+    border-bottom: 1px solid #cccccc;
+  }
+
+  .submit-button {
+    position: relative;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    background-color: #eeeeee;
+    border: 0;
+    border-radius: 4px;
+    padding: 8px;
+    cursor: pointer;
+  }
+
+  .submit-button.loading {
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
+  .submit-button.loading::after {
+    content: 'Loading...';
+    position: absolute;
+    inset: 0;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #cccccc;
+    padding: 8px;
+  }
+</style>
 
 <form onsubmit="onSubmit(event)">
-  {{ 'product.product_id' | t }}: <input type="text" name="product_id" />
-  <button type="submit">送信</button>
+  {{ 'product.product_id' | t }}： <input class="product-id-input" type="text" name="product_id" placeholder="8961802961171" value="8961802961171" />
+  <button class="submit-button" type="submit">{{ 'product.submit' | t }}</button>
 </form>
+<div id="result"></div>

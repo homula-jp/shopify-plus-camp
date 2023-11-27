@@ -1,7 +1,10 @@
 async function onSubmit(event) {
   event.preventDefault();
+  const resultArea = document.querySelector("#result");
+  const submitButton = document.querySelector(".submit-button");
+  submitButton.classList.toggle("loading");
+  resultArea.innerHTML = "";
   const formData = new FormData(event.currentTarget);
-  console.log(Object.fromEntries(formData));
 
   const fetchOptions = {
     method: "POST",
@@ -12,5 +15,7 @@ async function onSubmit(event) {
   };
 
   const response = await fetch("/apps/homula-app/api/test", fetchOptions);
-  console.log(response);
+  const productName = (await response.json()).data.title;
+  resultArea.innerHTML = `商品名：${productName}`;
+  submitButton.classList.toggle("loading");
 }

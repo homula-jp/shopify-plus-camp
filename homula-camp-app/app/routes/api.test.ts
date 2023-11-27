@@ -1,34 +1,73 @@
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
+import { authenticate } from "~/shopify.server";
 
-export async function action({ request }: LoaderFunctionArgs) {
+async function getBody(request: Request) {
   const reader = request.body?.getReader();
 
-  while (reader) {
-    const { done, value } = await reader?.read();
-    const decoder = new TextDecoder();
-    const item = decoder.decode(value).replace(/\[|]/g, "").replace(/^,/, "");
-    const parsedItem = JSON.parse(item);
-    const row = document.createElement("tr");
-
-    const idCell = document.createElement("td");
-    const nameCell = document.createElement("td");
-    const birthDateCell = document.createElement("td");
-
-    idCell.innerHTML = parsedItem.id;
-    nameCell.innerHTML = parsedItem.name;
-    birthDateCell.innerHTML = parsedItem.birthDate;
-
-    row.appendChild(idCell);
-    row.appendChild(nameCell);
-    row.appendChild(birthDateCell);
-    table.appendChild(row);
+  if (!reader) {
+    return null;
   }
-  debugger;
+
+  const decoder = new TextDecoder();
+  const chunks = [];
+
+  while (true) {
+    const { done, value } = await reader?.read();
+    if (done) {
+      return JSON.parse(chunks.join(""));
+    }
+    const chunk = decoder.decode(value);
+    chunks.push(chunk);
+  }
+}
+
+async function getProduct(request: Request, productId: string) {
+  const { admin } = await authenticate.public.appProxy(request);
+  const response = await admin
+    ?.graphql(
+      `#graphql
+      query getProduct($input: ID!) {
+        product(id: $input) {
+          id
+          createdAt
+          title
+          updatedAt
+        }
+      }
+    `,
+      {
+        variables: {
+          input: productId,
+        },
+      }
+    )
+    ?.catch((error) => {
+      return null;
+    });
+
+  const responseJson = await response?.json();
+  const product = responseJson?.data?.product;
+
+  if (!product) {
+    throw new Error("Product not found");
+  }
+
+  return product;
+}
+
+export async function action({ request }: LoaderFunctionArgs) {
+  const body = await getBody(request);
+  const productId = body?.product_id;
+  const product = await getProduct(
+    request,
+    `gid://shopify/Product/${productId}`
+  );
+
+  console.log(product);
+
   return json(
     {
-      data: {
-        message: body,
-      },
+      data: product,
     },
     {
       headers: {

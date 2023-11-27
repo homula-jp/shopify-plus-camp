@@ -6,6 +6,7 @@
     padding: 8px;
     background-color: #fafafa;
     border-bottom: 1px solid #cccccc;
+    width: 280px;
   }
 
   .submit-button {
@@ -39,7 +40,7 @@
 </style>
 
 <form onsubmit="onSubmit(event)">
-  {{ 'product.product_id' | t }}： <input class="product-id-input" type="text" name="product_id" placeholder="8961802961171" value="8961802961171" />
+  {{ 'product.product_id' | t }}： <input class="product-id-input" type="text" name="product_id" placeholder="gid://shopify/Product/8961802961171" value="gid://shopify/Product/8961802961171" />
   <button class="submit-button" type="submit">{{ 'product.submit' | t }}</button>
 </form>
 <div id="result"></div>

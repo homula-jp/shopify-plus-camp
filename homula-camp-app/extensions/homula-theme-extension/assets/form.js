@@ -14,8 +14,14 @@ async function onSubmit(event) {
     body: JSON.stringify(Object.fromEntries(formData)),
   };
 
-  const response = await fetch("/apps/homula-app/api/test", fetchOptions);
-  const productName = (await response.json()).data.title;
-  resultArea.innerHTML = `商品名：${productName}`;
-  submitButton.classList.toggle("loading");
+  try {
+    const response = await fetch("/apps/homula-app/api/test", fetchOptions);
+    const result = await response.json();
+    const productName = result.data.title;
+    resultArea.innerHTML = `商品名：${productName}`;
+  } catch (error) {
+    console.log(error);
+  } finally {
+    submitButton.classList.toggle("loading");
+  }
 }

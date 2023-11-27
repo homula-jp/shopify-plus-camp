@@ -58,12 +58,7 @@ async function getProduct(request: Request, productId: string) {
 export async function action({ request }: LoaderFunctionArgs) {
   const body = await getBody(request);
   const productId = body?.product_id;
-  const product = await getProduct(
-    request,
-    `gid://shopify/Product/${productId}`
-  );
-
-  console.log(product);
+  const product = await getProduct(request, productId);
 
   return json(
     {

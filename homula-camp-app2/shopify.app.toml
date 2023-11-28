@@ -2,19 +2,19 @@
 
 name = "homula-camp-app2"
 client_id = "f63d951aa165d6ca3e29fdb686b82275"
-application_url = "https://disputes-later-evaluate-burning.trycloudflare.com"
+application_url = "https://nightmare-vacuum-reading-nested.trycloudflare.com"
 embedded = true
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "read_orders,read_assigned_fulfillment_orders,read_merchant_managed_fulfillment_orders,read_third_party_fulfillment_orders"
+scopes = "read_orders,read_assigned_fulfillment_orders,read_merchant_managed_fulfillment_orders,read_third_party_fulfillment_orders,write_assigned_fulfillment_orders,write_merchant_managed_fulfillment_orders,write_third_party_fulfillment_orders"
 
 [auth]
 redirect_urls = [
-  "https://disputes-later-evaluate-burning.trycloudflare.com/auth/callback",
-  "https://disputes-later-evaluate-burning.trycloudflare.com/auth/shopify/callback",
-  "https://disputes-later-evaluate-burning.trycloudflare.com/api/auth/callback",
-  "https://disputes-later-evaluate-burning.trycloudflare.com/.shopify/graphiql/auth/callback"
+  "https://nightmare-vacuum-reading-nested.trycloudflare.com/auth/callback",
+  "https://nightmare-vacuum-reading-nested.trycloudflare.com/auth/shopify/callback",
+  "https://nightmare-vacuum-reading-nested.trycloudflare.com/api/auth/callback",
+  "https://nightmare-vacuum-reading-nested.trycloudflare.com/.shopify/graphiql/auth/callback"
 ]
 
 [webhooks]

@@ -1,7 +1,12 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import type { SubmitFunction } from "@remix-run/react";
-import { useLoaderData, useNavigation, useSubmit } from "@remix-run/react";
+import {
+  useActionData,
+  useLoaderData,
+  useNavigation,
+  useSubmit,
+} from "@remix-run/react";
 import {
   Page,
   Button,
@@ -15,7 +20,7 @@ import {
   Form,
 } from "@shopify/polaris";
 import dayjs from "dayjs";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { authenticate } from "~/shopify.server";
 import type { Order } from "~/types/order";
 import type { Data } from "~/types/remix";
@@ -33,16 +38,18 @@ export const getOrderList = async ({ request }: ActionFunctionArgs) => {
             updatedAt
             displayFulfillmentStatus
             fulfillmentOrders(first: 20) {
-              nodes {
-                id
-                createdAt
-                updatedAt
-                fulfillAt
-                fulfillBy
-                orderId
-                orderName
-                status
-                requestStatus
+              edges {
+                node {
+                  id
+                  createdAt
+                  updatedAt
+                  fulfillAt
+                  fulfillBy
+                  orderId
+                  orderName
+                  status
+                  requestStatus
+                }
               }
             }
           }
@@ -81,22 +88,22 @@ export const fulfillOrder = async ({
   const { admin } = await authenticate.admin(request);
   const response = await admin.graphql(
     `#graphql
-      mutation orderUpdate($input: OrderInput!) {
-        orderUpdate(input: $input) {
-          order {
+      mutation fulfillmentCreateV2($fulfillment: FulfillmentV2Input!) {
+        fulfillmentCreateV2(fulfillment: $fulfillment) {
+          fulfillment {
             id
-            createdAt
-            customAttributes {
-              key
-              value
-            }
-            displayFulfillmentStatus
             name
-            note
-            customer {
-              displayName
+            status
+            fulfillmentOrders(first: 3, reverse: true) {
+              edges {
+                node {
+                  id
+                  createdAt
+                  status
+                  requestStatus
+                }
+              }
             }
-            updatedAt
           }
           userErrors {
             field
@@ -107,8 +114,10 @@ export const fulfillOrder = async ({
     `,
     {
       variables: {
-        input: {
-          id: params.id,
+        fulfillment: {
+          lineItemsByFulfillmentOrder: {
+            fulfillmentOrderId: params.id,
+          },
         },
       },
     }
@@ -116,7 +125,7 @@ export const fulfillOrder = async ({
 
   const responseJson = await response.json();
 
-  return json(responseJson.data.orderUpdate.order as Order);
+  return json(responseJson.data.fulfillmentCreateV2.fulfillment);
 };
 
 export const action = async ({ request, context }: ActionFunctionArgs) => {
@@ -124,13 +133,13 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
   const _action = formData.get("_action");
 
   if (_action === "FULFILL_ORDER") {
-    const newOrders = (formData.getAll("orders[]") as string[]).map((data) =>
-      JSON.parse(data)
+    const targets = (formData.getAll("fulfillmentOrders[]") as string[]).map(
+      (data) => JSON.parse(data)
     ) as {
       id: Order["id"];
     }[];
     const result = await Promise.all(
-      newOrders.map(async ({ id }) => {
+      targets.map(async ({ id }) => {
         const response = await fulfillOrder({
           request,
           params: { id },
@@ -142,39 +151,38 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
     );
 
     return json({
-      orders: result,
+      fulfillments: result,
     });
   }
 };
 
 export default function Index() {
   const data = useLoaderData<typeof loader>() as Data<typeof loader>;
-  const orders = data.orders;
+  const orders = useMemo(() => data.orders, [data.orders]);
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
     useIndexResourceState(
       orders as unknown as Parameters<typeof useIndexResourceState>[0]
     );
+  const actionData = useActionData<typeof action>() as Data<typeof action>;
   const nav = useNavigation();
   const submit = useSubmit();
   const isLoading =
     ["loading", "submitting"].includes(nav.state) && nav.formMethod === "POST";
-
   const submitAction = (target: Parameters<SubmitFunction>[0]) =>
     submit(target, { replace: true, method: "POST" });
+
   const onSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       const formData = new FormData(e.currentTarget);
-      selectedResources
-        .map((id) => orders.find((order) => order.id === id)!)
-        .forEach((order) => {
-          formData.append(
-            "orders[]",
-            JSON.stringify({
-              id: order.id,
-            })
-          );
-        });
+      selectedResources.forEach((fulfillmentOrderId) => {
+        formData.append(
+          "fulfillmentOrders[]",
+          JSON.stringify({
+            id: fulfillmentOrderId,
+          })
+        );
+      });
       submitAction(formData);
     },
     [orders, selectedResources]
@@ -192,7 +200,7 @@ export default function Index() {
                   <IndexTable
                     itemCount={orders.reduce(
                       (prev, order) =>
-                        order.fulfillmentOrders.nodes.length + prev,
+                        order.fulfillmentOrders.edges.length + prev,
                       0
                     )}
                     headings={[
@@ -208,13 +216,15 @@ export default function Index() {
                     onSelectionChange={handleSelectionChange}
                   >
                     {orders.map((order, index) => {
-                      return order.fulfillmentOrders.nodes.map(
-                        (fulfillmentOrder) => (
+                      return order.fulfillmentOrders.edges.map(
+                        ({ node: fulfillmentOrder }) => (
                           <IndexTable.Row
-                            key={order.id}
-                            id={order.id}
+                            key={fulfillmentOrder.id}
+                            id={fulfillmentOrder.id}
                             position={index}
-                            selected={selectedResources.includes(order.id)}
+                            selected={selectedResources.includes(
+                              fulfillmentOrder.id
+                            )}
                           >
                             <IndexTable.Cell>
                               <Text
@@ -245,7 +255,7 @@ export default function Index() {
                     })}
                   </IndexTable>
                   <InlineStack gap="300">
-                    <input type="hidden" name="_action" value="UPDATE" />
+                    <input type="hidden" name="_action" value="FULFILL_ORDER" />
                     <Button
                       submit
                       disabled={selectedResources.length === 0 || isLoading}
@@ -258,6 +268,27 @@ export default function Index() {
               </BlockStack>
             </Card>
           </Layout.Section>
+          {actionData?.fulfillments?.length && (
+            <Layout.Section>
+              <Card>
+                <BlockStack gap="500">
+                  <Text as="h2" variant="headingMd">
+                    発送結果
+                  </Text>
+                  {actionData.fulfillments.map((fulfillment) => (
+                    <InlineStack gap="300" key={fulfillment.id}>
+                      <Text as="p" variant="headingMd">
+                        {fulfillment.name}
+                      </Text>
+                      <Text as="p" variant="bodyMd">
+                        {fulfillment.status}
+                      </Text>
+                    </InlineStack>
+                  ))}
+                </BlockStack>
+              </Card>
+            </Layout.Section>
+          )}
         </Layout>
       </BlockStack>
     </Page>

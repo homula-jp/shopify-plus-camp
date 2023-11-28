@@ -8,7 +8,9 @@ export interface Order {
 }
 
 interface FulfillmentOrders {
-  nodes: FulfillmentOrderNode[];
+  edges: {
+    node: FulfillmentOrderNode;
+  }[];
 }
 
 interface FulfillmentOrderNode {

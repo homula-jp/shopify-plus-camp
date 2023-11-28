@@ -1,0 +1,29 @@
+# fly.toml app configuration file generated for homula-camp-app on 2023-11-24T18:18:24+09:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "homula-camp-app"
+primary_region = "nrt"
+
+[env]
+PORT = "8081"
+SHOPIFY_APP_URL = "https://homula-camp-app.fly.dev"
+# HOST = "https://homula-camp-app.fly.dev"
+SHOPIFY_API_KEY = "a8afb1ab2ec6bc948536795b73e19062"
+SCOPES = "write_products,read_orders,write_orders,write_order_edits,read_customers"
+
+[build]
+
+[http_service]
+  internal_port = 8081
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 256

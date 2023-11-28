@@ -1,0 +1,6 @@
+{
+  "version": "extension version",
+  "cart": {
+    "length": "{{length}} items in your cart."
+  }
+}

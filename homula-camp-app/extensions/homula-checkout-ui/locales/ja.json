@@ -1,0 +1,6 @@
+{
+  "version": "extensionバージョン",
+  "cart": {
+    "length": "{{length}}個の商品がカートに入っています。"
+  }
+}

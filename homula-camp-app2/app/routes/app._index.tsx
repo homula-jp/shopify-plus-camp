@@ -230,7 +230,6 @@ export default function Index() {
                     headings={[
                       { title: "注文", alignment: "start" },
                       { title: "fulfillAt" },
-                      { title: "fulfillBy" },
                       { title: "requestStatus" },
                       { title: "status" },
                     ]}
@@ -263,9 +262,6 @@ export default function Index() {
                               {dayjs(fulfillmentOrder.fulfillAt).format(
                                 "YYYY/MM/DD HH:mm:ss"
                               )}
-                            </IndexTable.Cell>
-                            <IndexTable.Cell>
-                              {fulfillmentOrder.fulfillBy}
                             </IndexTable.Cell>
                             <IndexTable.Cell>
                               {fulfillmentOrder.requestStatus}

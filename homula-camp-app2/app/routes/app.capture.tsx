@@ -265,6 +265,7 @@ export default function Index() {
                         id={transaction.id}
                         position={index}
                         selected={selectedResources.includes(transaction.id)}
+                        disabled={!transaction.capturable}
                       >
                         <IndexTable.Cell>
                           <Text variant="bodyMd" fontWeight="bold" as="span">
@@ -311,7 +312,7 @@ export default function Index() {
                     order.transaction ? (
                       <InlineStack gap="300" key={order.transaction.id}>
                         <Text as="p" variant="headingMd">
-                          {order.transaction.amountSet.paresentmentMoney.amount}
+                          {order.transaction.amountSet.presentmentMoney.amount}
                         </Text>
                         <Text as="p" variant="bodyMd">
                           {order.transaction.kind}

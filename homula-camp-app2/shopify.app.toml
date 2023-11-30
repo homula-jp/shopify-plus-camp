@@ -2,7 +2,7 @@
 
 name = "homula-camp-app2"
 client_id = "f63d951aa165d6ca3e29fdb686b82275"
-application_url = "https://hh-aviation-geography-oo.trycloudflare.com"
+application_url = "https://homula-camp-app2.fly.dev"
 embedded = true
 
 [access_scopes]
@@ -11,10 +11,10 @@ scopes = "read_orders,read_assigned_fulfillment_orders,read_merchant_managed_ful
 
 [auth]
 redirect_urls = [
-  "https://hh-aviation-geography-oo.trycloudflare.com/auth/callback",
-  "https://hh-aviation-geography-oo.trycloudflare.com/auth/shopify/callback",
-  "https://hh-aviation-geography-oo.trycloudflare.com/api/auth/callback",
-  "https://hh-aviation-geography-oo.trycloudflare.com/.shopify/graphiql/auth/callback"
+  "https://homula-camp-app2.fly.dev/auth/callback",
+  "https://homula-camp-app2.fly.dev/auth/shopify/callback",
+  "https://homula-camp-app2.fly.dev/api/auth/callback",
+  "https://homula-camp-app2.fly.dev/.shopify/graphiql/auth/callback"
 ]
 
 [webhooks]
@@ -24,5 +24,5 @@ api_version = "2023-10"
 embedded = false
 
 [build]
-automatically_update_urls_on_dev = true
+automatically_update_urls_on_dev = false
 dev_store_url = "homula-camp-2.myshopify.com"

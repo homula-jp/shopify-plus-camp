@@ -73,12 +73,12 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
   const shopId = formData.get("shopId") as string;
 
   const email = formData.get("email") as string;
-  const identifier = formData.get("identifier") as string;
-  const first_name = formData.get("first_name") as string;
-  const last_name = formData.get("last_name") as string;
-  const tag_string = formData.get("tag_string") as string;
-  const remote_ip = formData.get("remote_ip") as string;
-  const return_to = formData.get("return_to") as string;
+  // const identifier = formData.get("identifier") as string;
+  // const first_name = formData.get("first_name") as string;
+  // const last_name = formData.get("last_name") as string;
+  // const tag_string = formData.get("tag_string") as string;
+  // const remote_ip = formData.get("remote_ip") as string;
+  // const return_to = formData.get("return_to") as string;
   const multipassJson = {
     email,
     // identifier,
@@ -204,11 +204,13 @@ export default function Multipass() {
           <p>
             <button type="submit">ログイン</button>
           </p>
+          <label htmlFor="shop">shop URL:</label>
           <input
-            type="hidden"
+            type="text"
             name="shop"
             value={(data.shop as string) ?? undefined}
             id="shop"
+            style={{ width: "280px" }}
           />
           <input
             type="hidden"

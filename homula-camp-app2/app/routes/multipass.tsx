@@ -81,12 +81,12 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
   const return_to = formData.get("return_to") as string;
   const multipassJson = {
     email,
-    identifier,
-    first_name,
-    last_name,
-    tag_string,
-    remote_ip,
-    return_to,
+    // identifier,
+    // first_name,
+    // last_name,
+    // tag_string,
+    // remote_ip,
+    // return_to,
     created_at: new Date().toISOString(),
   };
 
@@ -129,7 +129,7 @@ export default function Multipass() {
                 placeholder="test@example.com"
               />
             </div>
-            <div className="input">
+            {/* <div className="input">
               <label htmlFor="identifier">Identifier:</label>
               <br />
               <input
@@ -199,7 +199,7 @@ export default function Multipass() {
                 id="return_to"
                 placeholder="http://your_store_or_some_specific_site"
               />
-            </div>
+            </div> */}
           </fieldset>
           <p>
             <button type="submit">ログイン</button>

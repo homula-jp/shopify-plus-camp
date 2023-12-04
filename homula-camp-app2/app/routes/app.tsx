@@ -24,6 +24,7 @@ export default function App() {
           Home
         </Link>
         <Link to="/app/capture">Capture Order</Link>
+        <Link to="/app/multipass">Multipass</Link>
       </ui-nav-menu>
       <Outlet />
     </AppProvider>

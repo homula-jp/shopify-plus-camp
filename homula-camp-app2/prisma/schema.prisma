@@ -20,3 +20,9 @@ model Session {
   accessToken String
   userId      BigInt?
 }
+
+model MultipassSecret {
+  id          String    @id
+  shop        String
+  secret      String
+}

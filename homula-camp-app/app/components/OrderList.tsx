@@ -99,7 +99,7 @@ export const OrderList: React.FC<OrderListProps> = ({
                 <IndexTable.Cell>
                   {dayjs(order.createdAt).format("YYYY/MM/DD HH:mm:ss")}
                 </IndexTable.Cell>
-                <IndexTable.Cell>{order.customer.displayName}</IndexTable.Cell>
+                <IndexTable.Cell>{order.customer?.displayName}</IndexTable.Cell>
                 <IndexTable.Cell>{engravingText.join(", ")}</IndexTable.Cell>
                 <IndexTable.Cell>{completed ? "済" : "未"}</IndexTable.Cell>
               </IndexTable.Row>

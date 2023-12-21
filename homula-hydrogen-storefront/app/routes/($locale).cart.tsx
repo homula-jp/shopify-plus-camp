@@ -29,15 +29,15 @@ export async function action({request, context}: ActionFunctionArgs) {
 
   switch (action) {
     case CartForm.ACTIONS.LinesAdd:
-      result = await cart.addLines(inputs.lines);
+      result = await cart?.addLines(inputs.lines);
       break;
     case CartForm.ACTIONS.LinesUpdate:
-      result = await cart.updateLines(inputs.lines);
+      result = await cart?.updateLines(inputs.lines);
       break;
     case CartForm.ACTIONS.LinesRemove:
-      result = await cart.removeLines(inputs.lineIds);
+      result = await cart?.removeLines(inputs.lineIds);
       break;
-    case CartForm.ACTIONS.DiscountCodesUpdate: {
+    case CartForm.ACTIONS?.DiscountCodesUpdate: {
       const formDiscountCode = inputs.discountCode;
 
       // User inputted discount code

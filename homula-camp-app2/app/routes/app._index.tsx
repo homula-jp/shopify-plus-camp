@@ -30,7 +30,7 @@ export const getOrderList = async ({ request }: ActionFunctionArgs) => {
   const response = await admin.graphql(
     `#graphql
       query getOrders {
-        orders(first: 20, query: "fulfillment_status:unshipped") {
+        orders(first: 20) {
           nodes {
             id
             createdAt

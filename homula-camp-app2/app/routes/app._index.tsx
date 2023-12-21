@@ -185,7 +185,9 @@ export default function Index() {
   const orders = useMemo(() => data.orders, [data.orders]);
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
     useIndexResourceState(
-      orders as unknown as Parameters<typeof useIndexResourceState>[0]
+      orders.flatMap(({ fulfillmentOrders }) =>
+        fulfillmentOrders.edges.map(({ node }) => node)
+      ) as unknown as Parameters<typeof useIndexResourceState>[0]
     );
   const actionData = useActionData<typeof action>() as Data<typeof action>;
   const nav = useNavigation();
@@ -199,14 +201,30 @@ export default function Index() {
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       const formData = new FormData(e.currentTarget);
-      selectedResources.forEach((fulfillmentOrderId) => {
-        formData.append(
-          "fulfillmentOrders[]",
-          JSON.stringify({
-            id: fulfillmentOrderId,
-          })
-        );
-      });
+
+      selectedResources
+        .map(
+          (fullfillmentOrderId) =>
+            orders.find(({ fulfillmentOrders }) =>
+              fulfillmentOrders.edges.find(
+                ({ node: { id } }) => fullfillmentOrderId === id
+              )
+            )!
+        )
+        .filter(({ fulfillmentOrders }) => {
+          const completed = fulfillmentOrders.edges.find(
+            ({ node: { status } }) => status !== "OPEN"
+          );
+          return !completed;
+        })
+        .forEach((fulfillmentOrderId) => {
+          formData.append(
+            "fulfillmentOrders[]",
+            JSON.stringify({
+              id: fulfillmentOrderId,
+            })
+          );
+        });
       submitAction(formData);
     },
     [orders, selectedResources]
@@ -240,37 +258,42 @@ export default function Index() {
                   >
                     {orders.map((order, index) => {
                       return order.fulfillmentOrders.edges.map(
-                        ({ node: fulfillmentOrder }) => (
-                          <IndexTable.Row
-                            key={fulfillmentOrder.id}
-                            id={fulfillmentOrder.id}
-                            position={index}
-                            selected={selectedResources.includes(
-                              fulfillmentOrder.id
-                            )}
-                          >
-                            <IndexTable.Cell>
-                              <Text
-                                variant="bodyMd"
-                                fontWeight="bold"
-                                as="span"
-                              >
-                                {order.name}
-                              </Text>
-                            </IndexTable.Cell>
-                            <IndexTable.Cell>
-                              {dayjs(fulfillmentOrder.fulfillAt).format(
-                                "YYYY/MM/DD HH:mm:ss"
-                              )}
-                            </IndexTable.Cell>
-                            <IndexTable.Cell>
-                              {fulfillmentOrder.requestStatus}
-                            </IndexTable.Cell>
-                            <IndexTable.Cell>
-                              {fulfillmentOrder.status}
-                            </IndexTable.Cell>
-                          </IndexTable.Row>
-                        )
+                        ({ node: fulfillmentOrder }) => {
+                          const completed = fulfillmentOrder.status !== "OPEN";
+                          return (
+                            <IndexTable.Row
+                              key={fulfillmentOrder.id}
+                              id={fulfillmentOrder.id}
+                              position={index}
+                              selected={
+                                !completed &&
+                                selectedResources.includes(fulfillmentOrder.id)
+                              }
+                              disabled={completed}
+                            >
+                              <IndexTable.Cell>
+                                <Text
+                                  variant="bodyMd"
+                                  fontWeight="bold"
+                                  as="span"
+                                >
+                                  {order?.name}
+                                </Text>
+                              </IndexTable.Cell>
+                              <IndexTable.Cell>
+                                {dayjs(fulfillmentOrder.fulfillAt).format(
+                                  "YYYY/MM/DD HH:mm:ss"
+                                )}
+                              </IndexTable.Cell>
+                              <IndexTable.Cell>
+                                {fulfillmentOrder.requestStatus}
+                              </IndexTable.Cell>
+                              <IndexTable.Cell>
+                                {fulfillmentOrder.status}
+                              </IndexTable.Cell>
+                            </IndexTable.Row>
+                          );
+                        }
                       );
                     })}
                   </IndexTable>

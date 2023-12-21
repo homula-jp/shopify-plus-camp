@@ -88,7 +88,7 @@ export const OrderList: React.FC<OrderListProps> = ({
                 key={order.id}
                 id={order.id}
                 position={index}
-                selected={completed || selectedResources.includes(order.id)}
+                selected={!completed && selectedResources.includes(order.id)}
                 disabled={completed}
               >
                 <IndexTable.Cell>
